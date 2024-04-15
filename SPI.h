@@ -18,8 +18,12 @@
 #define PIN17_IDX                       17u   /*!< Pin number for pin 17 in a port */
 
 #define TRANSFER_SIZE     64U     /*! Transfer dataSize */
-#define TRANSFER_BAUDRATE 1000000U /*! Transfer baudrate - 500k */
+#define TRANSFER_BAUDRATE_NOKIA 1000000U /*! Transfer baudrate - 1M */
+#define TRANSFER_BAUDRATE_MEMORY 2000000U /*! Transfer baudrate - 2M */
+
 
 void SPI_config(void);
+void SPI_nokia_led_config(void);
+void SPI_memory_config(void);
 
 #endif /* SPI_H_ */
