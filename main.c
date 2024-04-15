@@ -24,7 +24,7 @@
 
 
 /*! This array hold the initial picture that is shown in the LCD. Note that extern should be avoided*/
-extern const uint8_t ITESO[504];
+extern const uint8_t ITESO[IMAGE_SIZE];
 
 int main(void)
 {

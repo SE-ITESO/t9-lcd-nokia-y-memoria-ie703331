@@ -35,9 +35,7 @@ void SPI_config(void)
 
 void SPI_nokia_led_config(void)
 {
-
 	//configuration for nokia 5110 led screen
-
 
 	/* Master config */
 	masterConfig.whichCtar                                = kDSPI_Ctar0;
@@ -88,3 +86,9 @@ void SPI_memory_config(void)
 
 	DSPI_MasterInit(SPI0, &masterConfig, srcClock_Hz);
 }
+
+void SPI_recive_byte(uint8_t data_r)
+{
+
+}
+
