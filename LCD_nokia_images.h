@@ -32,7 +32,7 @@ void LCD_image_print(uint8_t image_N);
 
 void LCD_store_images(void);
 
-void LCD_recive_image_byte(void);
+void LCD_recive_image_byte(uint8_t image_N);
 
 
 #endif /* LCD_NOKIA_IMAGES_H_ */

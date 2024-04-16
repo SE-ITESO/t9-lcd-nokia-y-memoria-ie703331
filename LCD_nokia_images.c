@@ -85,18 +85,16 @@ void LCD_image_print(uint8_t image_N)
 
 void LCD_store_images(void)
 {
-	LCD_recive_image_byte();
-	/*
-	LCD_recive_image_byte(2);
-	LCD_recive_image_byte(3);
-	LCD_recive_image_byte(4);
-	LCD_recive_image_byte(5);
-	*/
+	LCD_recive_image_byte(IMAGE_1);
+	LCD_recive_image_byte(IMAGE_2);
+	LCD_recive_image_byte(IMAGE_3);
+	LCD_recive_image_byte(IMAGE_4);
+	LCD_recive_image_byte(IMAGE_5);
 
 }
 
 
-void LCD_recive_image_byte(void)
+void LCD_recive_image_byte(uint8_t image_N)
 {
 	/*
 	 * TODO: read byte by byte
@@ -105,14 +103,38 @@ void LCD_recive_image_byte(void)
 
 	}
 	*/
-
 	dspi_half_duplex_transfer_t TransferMemory;
 
-	TransferMemory.txData					= g_master_txImage_01_Addr;
-	TransferMemory.rxData					= g_master_rxBuffImage_01;
+
+	switch(image_N)
+	{
+	default:
+		TransferMemory.txData = g_master_txImage_01_Addr;
+		TransferMemory.rxData = g_master_rxBuffImage_01;
+	break;
+	case IMAGE_2:
+		TransferMemory.txData = g_master_txImage_02_Addr;
+		TransferMemory.rxData = g_master_rxBuffImage_02;
+	break;
+	case IMAGE_3:
+		TransferMemory.txData = g_master_txImage_03_Addr;
+		TransferMemory.rxData = g_master_rxBuffImage_03;
+	break;
+	case IMAGE_4:
+		TransferMemory.txData = g_master_txImage_04_Addr;
+		TransferMemory.rxData = g_master_rxBuffImage_04;
+	break;
+	case IMAGE_5:
+		TransferMemory.txData = g_master_txImage_05_Addr;
+		TransferMemory.rxData = g_master_rxBuffImage_05;
+	break;
+
+	}
+
+	// actualmente lee la imagen completa
 
 	TransferMemory.txDataSize				= ADDR_SIZE;
-	TransferMemory.rxDataSize				= IMAGE_SIZE; // actualmente lee el dato completo
+	TransferMemory.rxDataSize				= IMAGE_SIZE;
 	TransferMemory.isTransmitFirst			= true;
 	TransferMemory.isPcsAssertInTransfer	= true;
 	TransferMemory.configFlags				= kDSPI_MasterCtar1 | kDSPI_MasterPcs1 | kDSPI_MasterPcsContinuous;
