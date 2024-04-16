@@ -2,13 +2,6 @@
 
 #include "LCD_nokia_images.h"
 
-// 0x03 is the read command for the memory, the rest is the address of image to read
-static uint8_t g_master_txImage_01_Addr[ADDR_SIZE] = {0x4u, 0x00u, 0x00u};
-static uint8_t g_master_txImage_02_Addr[ADDR_SIZE] = {0x4u, 0x10u, 0x00u};
-static uint8_t g_master_txImage_03_Addr[ADDR_SIZE] = {0x4u, 0x20u, 0x00u};
-static uint8_t g_master_txImage_04_Addr[ADDR_SIZE] = {0x4u, 0x30u, 0x00u};
-static uint8_t g_master_txImage_05_Addr[ADDR_SIZE] = {0x4u, 0x40u, 0x00u};
-
 static uint8_t g_master_rxBuffImage_01[IMAGE_SIZE];
 static uint8_t g_master_rxBuffImage_02[IMAGE_SIZE];
 static uint8_t g_master_rxBuffImage_03[IMAGE_SIZE];
@@ -84,23 +77,16 @@ void LCD_image_print(uint8_t image_N)
 void LCD_store_images(void)
 {
 	LCD_recive_image_byte(IMAGE_1);
-	//LCD_recive_image_byte(IMAGE_2);
-	//LCD_recive_image_byte(IMAGE_3);
-	//LCD_recive_image_byte(IMAGE_4);
-	//LCD_recive_image_byte(IMAGE_5);
+	LCD_recive_image_byte(IMAGE_2);
+	LCD_recive_image_byte(IMAGE_3);
+	LCD_recive_image_byte(IMAGE_4);
+	LCD_recive_image_byte(IMAGE_5);
 
 }
 
 void LCD_recive_image_byte(uint8_t image_N)
 {
-	/*
-	 * TODO: read byte by byte
-	while (data_received_counter <= IMAGE_SIZE)
-	{
-
-	}
-	*/
-	uint32_t direction  = direction01;
+	uint32_t direction;
     uint8_t current_addr[ADDR_SIZE];
 
     current_addr[0] = MEMORY_READ_COMMAND;
@@ -117,13 +103,62 @@ void LCD_recive_image_byte(uint8_t image_N)
     		data_received_counter < IMAGE_SIZE;
     		data_received_counter++)
     {
-    	current_addr[1] = ((direction) & DATA_HIGH) >> 16;
-    	current_addr[2] = ((direction+data_received_counter) & DATA_MID)  >> 8;
-    	current_addr[3] = ((direction+data_received_counter) & DATA_LOW);
+    	switch(image_N)
+    	{
+    	default:
+    		direction = direction01;
+
+        	TransferMemory.rxData = g_master_rxBuffImage_01 + data_received_counter;
+
+        	current_addr[1] = ((direction) & DATA_HIGH) >> 16;
+        	current_addr[2] = ((direction+data_received_counter) & DATA_MID)  >> 8;
+        	current_addr[3] = ((direction+data_received_counter) & DATA_LOW);
+
+    	break;
+    	case IMAGE_2:
+    		direction = direction02;
+
+        	TransferMemory.rxData = g_master_rxBuffImage_02 + data_received_counter;
+
+
+        	current_addr[1] = ((direction) & DATA_HIGH) >> 16;
+        	current_addr[2] = ((direction+data_received_counter) & DATA_MID)  >> 8;
+        	current_addr[3] = ((direction+data_received_counter) & DATA_LOW);
+
+    	break;
+    	case IMAGE_3:
+    		direction = direction03;
+
+        	TransferMemory.rxData = g_master_rxBuffImage_03 + data_received_counter;
+
+        	current_addr[1] = ((direction) & DATA_HIGH) >> 16;
+        	current_addr[2] = ((direction+data_received_counter) & DATA_MID)  >> 8;
+        	current_addr[3] = ((direction+data_received_counter) & DATA_LOW);
+
+    	break;
+    	case IMAGE_4:
+    		direction = direction04;
+
+        	TransferMemory.rxData = g_master_rxBuffImage_04 + data_received_counter;
+
+        	current_addr[1] = ((direction) & DATA_HIGH) >> 16;
+        	current_addr[2] = ((direction+data_received_counter) & DATA_MID)  >> 8;
+        	current_addr[3] = ((direction+data_received_counter) & DATA_LOW);
+
+    	break;
+    	case IMAGE_5:
+    		direction = direction05;
+
+        	TransferMemory.rxData = g_master_rxBuffImage_05 + data_received_counter;
+
+        	current_addr[1] = ((direction) & DATA_HIGH) >> 16;
+        	current_addr[2] = ((direction+data_received_counter) & DATA_MID)  >> 8;
+        	current_addr[3] = ((direction+data_received_counter) & DATA_LOW);
+
+    	break;
+    	}
 
     	TransferMemory.txData = current_addr;
-    	TransferMemory.rxData = g_master_rxBuffImage_01 + data_received_counter;
-
 
     	DSPI_MasterHalfDuplexTransferBlocking(SPI0, &TransferMemory);
 
