@@ -2,20 +2,18 @@
 
 #include "LCD_nokia_images.h"
 
-// 0x03 is the read command for the memory, the rest is the address of image
-static uint8_t g_master_txImage_01_Addr[ADDR_SIZE] = {0x03, 0x04, 0x00, 0x00};
-static uint8_t g_master_txImage_02_Addr[ADDR_SIZE] = {0x03, 0x04, 0x10, 0x00};
-static uint8_t g_master_txImage_03_Addr[ADDR_SIZE] = {0x03, 0x04, 0x20, 0x00};
-static uint8_t g_master_txImage_04_Addr[ADDR_SIZE] = {0x03, 0x04, 0x30, 0x00};
-static uint8_t g_master_txImage_05_Addr[ADDR_SIZE] = {0x03, 0x04, 0x40, 0x00};
+// 0x03 is the read command for the memory, the rest is the address of image to read
+static uint8_t g_master_txImage_01_Addr[ADDR_SIZE] = {0x4u, 0x00u, 0x00u};
+static uint8_t g_master_txImage_02_Addr[ADDR_SIZE] = {0x4u, 0x10u, 0x00u};
+static uint8_t g_master_txImage_03_Addr[ADDR_SIZE] = {0x4u, 0x20u, 0x00u};
+static uint8_t g_master_txImage_04_Addr[ADDR_SIZE] = {0x4u, 0x30u, 0x00u};
+static uint8_t g_master_txImage_05_Addr[ADDR_SIZE] = {0x4u, 0x40u, 0x00u};
 
 static uint8_t g_master_rxBuffImage_01[IMAGE_SIZE];
 static uint8_t g_master_rxBuffImage_02[IMAGE_SIZE];
 static uint8_t g_master_rxBuffImage_03[IMAGE_SIZE];
 static uint8_t g_master_rxBuffImage_04[IMAGE_SIZE];
 static uint8_t g_master_rxBuffImage_05[IMAGE_SIZE];
-
-static uint8_t data_received_counter = 0;
 
 const uint8_t ITESO[] = {
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -86,13 +84,12 @@ void LCD_image_print(uint8_t image_N)
 void LCD_store_images(void)
 {
 	LCD_recive_image_byte(IMAGE_1);
-	LCD_recive_image_byte(IMAGE_2);
-	LCD_recive_image_byte(IMAGE_3);
-	LCD_recive_image_byte(IMAGE_4);
-	LCD_recive_image_byte(IMAGE_5);
+	//LCD_recive_image_byte(IMAGE_2);
+	//LCD_recive_image_byte(IMAGE_3);
+	//LCD_recive_image_byte(IMAGE_4);
+	//LCD_recive_image_byte(IMAGE_5);
 
 }
-
 
 void LCD_recive_image_byte(uint8_t image_N)
 {
@@ -103,41 +100,35 @@ void LCD_recive_image_byte(uint8_t image_N)
 
 	}
 	*/
+	uint32_t direction  = direction01;
+    uint8_t current_addr[ADDR_SIZE];
+
+    current_addr[0] = MEMORY_READ_COMMAND;
+
 	dspi_half_duplex_transfer_t TransferMemory;
 
-
-	switch(image_N)
-	{
-	default:
-		TransferMemory.txData = g_master_txImage_01_Addr;
-		TransferMemory.rxData = g_master_rxBuffImage_01;
-	break;
-	case IMAGE_2:
-		TransferMemory.txData = g_master_txImage_02_Addr;
-		TransferMemory.rxData = g_master_rxBuffImage_02;
-	break;
-	case IMAGE_3:
-		TransferMemory.txData = g_master_txImage_03_Addr;
-		TransferMemory.rxData = g_master_rxBuffImage_03;
-	break;
-	case IMAGE_4:
-		TransferMemory.txData = g_master_txImage_04_Addr;
-		TransferMemory.rxData = g_master_rxBuffImage_04;
-	break;
-	case IMAGE_5:
-		TransferMemory.txData = g_master_txImage_05_Addr;
-		TransferMemory.rxData = g_master_rxBuffImage_05;
-	break;
-
-	}
-
-	// actualmente lee la imagen completa
-
 	TransferMemory.txDataSize				= ADDR_SIZE;
-	TransferMemory.rxDataSize				= IMAGE_SIZE;
+	TransferMemory.rxDataSize				= BYTE_SIZE;
 	TransferMemory.isTransmitFirst			= true;
 	TransferMemory.isPcsAssertInTransfer	= true;
 	TransferMemory.configFlags				= kDSPI_MasterCtar1 | kDSPI_MasterPcs1 | kDSPI_MasterPcsContinuous;
 
-	DSPI_MasterHalfDuplexTransferBlocking(SPI0, &TransferMemory);
+    for( uint16_t data_received_counter = 0;
+    		data_received_counter < IMAGE_SIZE;
+    		data_received_counter++)
+    {
+    	current_addr[1] = ((direction) & DATA_HIGH) >> 16;
+    	current_addr[2] = ((direction+data_received_counter) & DATA_MID)  >> 8;
+    	current_addr[3] = ((direction+data_received_counter) & DATA_LOW);
+
+    	TransferMemory.txData = current_addr;
+    	TransferMemory.rxData = g_master_rxBuffImage_01 + data_received_counter;
+
+
+    	DSPI_MasterHalfDuplexTransferBlocking(SPI0, &TransferMemory);
+
+    }
+
+
 }
+

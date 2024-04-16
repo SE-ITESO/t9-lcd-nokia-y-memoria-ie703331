@@ -13,9 +13,24 @@
 #include "SPI.h"
 #include "fsl_dspi.h"
 
-#define BYTE_SIZE 8
-#define ADDR_SIZE 4
-#define IMAGE_SIZE 504
+#define BYTE_SIZE 1u
+#define ADDR_SIZE 4u
+#define IMAGE_SIZE 504u
+
+#define DATA_HIGH   0xF0000u
+#define DATA_MID    0x0FF00u
+#define DATA_LOW    0x000FFu
+
+#define MEMORY_READ_COMMAND 0x03u
+
+#define direction01 0x040000u
+#define direction02 0x041000u
+#define direction03 0x042000u
+#define direction04 0x043000u
+#define direction05 0x044000u
+
+
+
 
 typedef enum
 {
