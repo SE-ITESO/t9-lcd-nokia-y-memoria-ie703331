@@ -22,9 +22,10 @@
 #include "SPI.h"
 #include "Delay.h"
 
+#define NUMBER_OF_IMAGES 5u
 
-/*! This array hold the initial picture that is shown in the LCD. Note that extern should be avoided*/
-extern const uint8_t ITESO[IMAGE_SIZE];
+static uint8_t image_counter = 0;
+
 
 int main(void)
 {
@@ -33,17 +34,17 @@ int main(void)
 	SPI_config();
 
 	LCD_nokia_init(); /*! Configuration function for the LCD */
+	LCD_store_images();
 
 	for(;;) {
 
 		LCD_nokia_clear();/*! It clears the information printed in the LCD*/
-		LCD_nokia_bitmap(ITESO); /*! It prints an array that hold an image, in this case is the initial picture*/
-		delay(65000);
-		LCD_nokia_clear();
-		delay(65000);
-		LCD_nokia_clear();
+		LCD_image_print(image_counter);
 
-
+        if (++image_counter > NUMBER_OF_IMAGES)
+        {
+        	image_counter = 0;
+        }
 		delay(65000);
 	}
 	

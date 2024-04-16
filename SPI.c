@@ -13,15 +13,22 @@ static uint32_t srcClock_Hz;
 
 void SPI_config(void)
 {
+
+
 	CLOCK_SetSimSafeDivs();
 
+	CLOCK_EnableClock(kCLOCK_Spi0);
 
 	CLOCK_EnableClock(kCLOCK_PortB);                           /* Port B Clock Gate Control: Clock enabled */
+	CLOCK_EnableClock(kCLOCK_PortC);                           /* Port B Clock Gate Control: Clock enabled */
 	CLOCK_EnableClock(kCLOCK_PortD);                           /* Port D Clock Gate Control: Clock enabled */
 
-	PORT_SetPinMux(PORTB, PIN16_IDX, kPORT_MuxAlt3);           /* PORTB16 (pin 62) is configured as UART0_RX */
-	PORT_SetPinMux(PORTB, PIN17_IDX, kPORT_MuxAlt3);           /* PORTB17 (pin 63) is configured as UART0_TX */
-	
+	/* PORTD3 (pin 96) is configured as SPI0_SIN */
+	PORT_SetPinMux(PORTD, 3U, kPORT_MuxAlt2);
+
+	/* PORTC3 (pin ) is configured as CE EEPROM */
+	PORT_SetPinMux(PORTC, 3U, kPORT_MuxAlt2);
+
 	PORT_SetPinMux(PORTD, PIN0_IDX, kPORT_MuxAlt2);            /* PORTD0 (pin 93) is configured as SPI0_PCS0 */
 	PORT_SetPinMux(PORTD, PIN1_IDX, kPORT_MuxAlt2);            /* PORTD1 (pin 94) is configured as SPI0_SCK */
 	PORT_SetPinMux(PORTD, PIN2_IDX, kPORT_MuxAlt2);            /* PORTD2 (pin 95) is configured as SPI0_SOUT */
@@ -85,10 +92,5 @@ void SPI_memory_config(void)
 	masterConfig.samplePoint                = kDSPI_SckToSin0Clock;
 
 	DSPI_MasterInit(SPI0, &masterConfig, srcClock_Hz);
-}
-
-void SPI_recive_byte(uint8_t data_r)
-{
-
 }
 

@@ -2,6 +2,21 @@
 
 #include "LCD_nokia_images.h"
 
+// 0x03 is the read command for the memory, the rest is the address of image
+static uint8_t g_master_txImage_01_Addr[ADDR_SIZE] = {0x03, 0x04, 0x00, 0x00};
+static uint8_t g_master_txImage_02_Addr[ADDR_SIZE] = {0x03, 0x04, 0x10, 0x00};
+static uint8_t g_master_txImage_03_Addr[ADDR_SIZE] = {0x03, 0x04, 0x20, 0x00};
+static uint8_t g_master_txImage_04_Addr[ADDR_SIZE] = {0x03, 0x04, 0x30, 0x00};
+static uint8_t g_master_txImage_05_Addr[ADDR_SIZE] = {0x03, 0x04, 0x40, 0x00};
+
+static uint8_t g_master_rxBuffImage_01[IMAGE_SIZE];
+static uint8_t g_master_rxBuffImage_02[IMAGE_SIZE];
+static uint8_t g_master_rxBuffImage_03[IMAGE_SIZE];
+static uint8_t g_master_rxBuffImage_04[IMAGE_SIZE];
+static uint8_t g_master_rxBuffImage_05[IMAGE_SIZE];
+
+static uint8_t data_received_counter = 0;
+
 const uint8_t ITESO[] = {
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x20, 0x20, 0x30, 0x30, 0x30, 0x38, 0x38, 0x3C, 0x3C, 0x7C, 0x7C, 0x7C, 0xFC, 0xFE, 0xFE,
@@ -37,3 +52,70 @@ const uint8_t ITESO[] = {
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		};
 
+void LCD_image_print(uint8_t image_N)
+{
+	switch(image_N)
+	{
+	case IMAGE_1:
+		LCD_nokia_bitmap(g_master_rxBuffImage_01);
+
+	break;
+	case IMAGE_2:
+		LCD_nokia_bitmap(g_master_rxBuffImage_02);
+
+	break;
+	case IMAGE_3:
+		LCD_nokia_bitmap(g_master_rxBuffImage_03);
+
+	break;
+	case IMAGE_4:
+		LCD_nokia_bitmap(g_master_rxBuffImage_04);
+
+	break;
+	case IMAGE_5:
+		LCD_nokia_bitmap(g_master_rxBuffImage_05);
+
+	break;
+	default:
+		LCD_nokia_bitmap(ITESO);
+
+	break;
+	}
+}
+
+void LCD_store_images(void)
+{
+	LCD_recive_image_byte();
+	/*
+	LCD_recive_image_byte(2);
+	LCD_recive_image_byte(3);
+	LCD_recive_image_byte(4);
+	LCD_recive_image_byte(5);
+	*/
+
+}
+
+
+void LCD_recive_image_byte(void)
+{
+	/*
+	 * TODO: read byte by byte
+	while (data_received_counter <= IMAGE_SIZE)
+	{
+
+	}
+	*/
+
+	dspi_half_duplex_transfer_t TransferMemory;
+
+	TransferMemory.txData					= g_master_txImage_01_Addr;
+	TransferMemory.rxData					= g_master_rxBuffImage_01;
+
+	TransferMemory.txDataSize				= ADDR_SIZE;
+	TransferMemory.rxDataSize				= IMAGE_SIZE; // actualmente lee el dato completo
+	TransferMemory.isTransmitFirst			= true;
+	TransferMemory.isPcsAssertInTransfer	= true;
+	TransferMemory.configFlags				= kDSPI_MasterCtar1 | kDSPI_MasterPcs1 | kDSPI_MasterPcsContinuous;
+
+	DSPI_MasterHalfDuplexTransferBlocking(SPI0, &TransferMemory);
+}

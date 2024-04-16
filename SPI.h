@@ -22,10 +22,6 @@
 #define TRANSFER_BAUDRATE_NOKIA 1000000U /*! Transfer baudrate - 1M */
 #define TRANSFER_BAUDRATE_MEMORY 2000000U /*! Transfer baudrate - 2M */
 
-#define IMAGE_SIZE 504
-
-
-
 void SPI_config(void);
 
 void SPI_nokia_led_config(void);
